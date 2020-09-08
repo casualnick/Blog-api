@@ -1,7 +1,14 @@
 class ApplicationController < ActionController::API
     include ActionController::MimeResponds
-    include ActionController::RequestForgeryProtection
     include Response
     include ExceptionHandler
-    protect_from_forgery with: :exception, unless: -> { request.format.json? } 
+
+    before_action :authorize_request
+    attr_reader :current_user
+
+    private
+
+    def authorize_request
+        @current_user = (AuthorizeApiRequest.new(request.headers).call)[:user]
+    end
 end
