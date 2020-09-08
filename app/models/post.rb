@@ -1,7 +1,7 @@
 class Post < ApplicationRecord
-  belongs_to :user
-  has_many :comments
-  
-  validate :title, presence: true, lenght: { minimum: 5 }
-  validate :content, presence: true, lenght: { minimum: 10 }
+    belongs_to :user
+    has_many :comments
+
+    validates :title, presence: true, length: { minimum: 5 }
+    validates :content, presence: true, length: { minimum: 10 }
 end
