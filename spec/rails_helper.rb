@@ -24,12 +24,15 @@ require 'rspec/rails'
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
   puts e.to_s.strip
   exit 1
 end
+
 RSpec.configure do |config|
 
   Shoulda::Matchers.configure do |config|
@@ -38,6 +41,9 @@ RSpec.configure do |config|
     with.library :rails
   end
 end
+
+ config.include RequestSpecHelper, type: :request
+ config.include ControllerSpecHelper, type: :request
 
   config.include FactoryBot::Syntax::Methods
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
