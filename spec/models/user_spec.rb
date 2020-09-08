@@ -2,23 +2,28 @@ require 'rails_helper'
 
 
 RSpec.describe User, type: :model do
-  let!(:user) { create(:user) }
-  before { user.email = 'foo@bar.com' }
+  let!(:user) { build(:user) }
+
+  before do
+    user.password = "12345678"
+    user.password_confirmation = "12345678"
+    user.save
+  end
   
 
   describe ' validation ' do
 
   it { should validate_presence_of :email }
   it { should validate_uniqueness_of :email }
-  it { should validate_presence_of :password}
-  it { should validate_length_of :password }
-  it { should validate_presence_of :password_confirmation }
+  it { should validate_presence_of :password_digest}
+  it { should validate_length_of :password_digest }
 
   end
   
   describe '#email' do
 
     it 'save correct email' do
+      user.email = "foo@bar.com"
       expect(user).to be_valid
     end
 
@@ -36,6 +41,7 @@ RSpec.describe User, type: :model do
     end
 
     it 'change role to admin' do
+      user.email = "foo@bar.com"
       user.admin!
       expect(user.role).to eq("admin")
     end
