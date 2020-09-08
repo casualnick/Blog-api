@@ -1,129 +1,119 @@
 require 'rails_helper'
 
 RSpec.describe "Posts", type: :request do
-    let!(:user) { create(:user) }
+    let(:user) { create(:user) }
     let!(:posts) { create_list(:post, 10, user_id: user.id) }
     let(:post_id) { posts.first.id }
     let(:user_id) { user.id }
+    let(:headers) { valid_headers }
 
-    describe 'GET /users/:user_id/posts' do
-        before { get "/users/#{user_id}/posts" }
+    describe 'GET /posts' do
+        before { get "/users/#{user_id}/posts", params: { }, headers: headers }
 
-        context 'user exist' do
-            
-            it 'return all posts' do
-                expect(json.size).to eq(10)
-            end
-            
-            it 'have http status 200' do
-                expect(response).to have_http_status(200)
-            end
-        
+        it 'return all posts' do
+            expect(json).not_to be_empty
+            expect(json.size).to eq(10)
         end
 
-        context 'user does not exist' do
-            let(:user_id) { 0 }
-
-            it 'have http status 404' do
-                expect(response).to have_http_status(404)
-            end
-
-            it 'return failure message not found' do
-                expect(response.body).to match(/Couldn't find User/)
-            end
+        it 'have http stauts 200' do
+            expect(response).to have_http_status(200)
         end
+
     end
 
-    describe 'GET /users/:user_id/posts/:post_id' do
-        before { get "/users/#{user_id}/posts/#{post_id}" }
+    describe 'GET /posts/:post_id' do
 
-        context 'post exists' do
-            
-            it 'return post' do
-                expect(json).not_to be_empty
+
+        context 'post exist' do
+            before { get "/users/#{user_id}/posts/#{post_id}", params: { }, headers: headers }
+
+            it 'returnt todo' do
                 expect(json['id']).to eq(post_id)
             end
 
-            it 'return status code 200' do
+            it 'have http status 200' do
                 expect(response).to have_http_status(200)
             end
+
         end
 
         context 'post does not exist' do
             let(:post_id) { 0 }
-
-            it 'have http status 404' do
-                expect(response).to have_http_status(404)
-            end
+            before { get "/users/#{user_id}/posts/#{post_id}", params: { }, headers: headers }
 
             it 'return failure message' do
                 expect(response.body).to match(/Couldn't find Post/)
             end
+            
+            it 'have http status 422' do
+                expect(response).to have_http_status(404)
+            end
+
         end
     end
 
-    describe 'POST /users/:user_id/posts' do
-        let(:valid_params) { { title: 'It is done', content: 'It is simple example text. You will not even spot it, do not disturb yourself' } }
+    describe 'POST /posts' do
+        let(:valid_params) { { title: 'arrow title', content: 'This is a very example content', author: user.id.to_s }.to_json }
 
         context 'valid params' do
-            before { post "/users/#{user_id}/posts", params: valid_params }
+            before { post "/users/#{user_id}/posts", params: valid_params, headers: headers }
+
+            it 'create post ' do
+                expect(json['title']).to eq('arrow title')
+            end
 
             it 'have http status 201' do
                 expect(response).to have_http_status(201)
             end
 
-            it 'create post successfully' do
-                expect(json['title']).to eq('It is done')
-            end
         end
-
+        
         context 'invalid params' do
-            before { post "/users/#{user_id}/posts", params: { } }
-
-            it 'have http status 422' do
-                expect(response).to have_http_status(422)
-            end
+            before { post "/users/#{user_id}/posts", params: {title: nil}.to_json, headers: headers}
 
             it 'return failure message' do
                 expect(response.body).to match(/Title can't be blank/)
             end
-        end
 
+            it 'have http status 422' do
+                expect(response).to have_http_status(422)
+            end
+        end
     end
 
-    describe 'PUT /users/:user_id/' do
-        let(:valid_params) { { title: 'I am the one and you are the second' } }
-        before { put "/users/#{user_id}/posts/#{post_id}", params: valid_params }
+    describe 'PUT /posts/:post_id' do
+        let(:valid_params) { { title: 'another arrow title'}.to_json }
 
-        context 'post exists' do
-
-            it 'have http status 204 ' do
-                expect(response).to have_http_status(204)
-            end
+        context 'valid params' do
+            before { put "/users/#{user_id}/posts/#{post_id}", params: valid_params, headers: headers }
 
             it 'update post properly' do
                 updated_post = Post.find(post_id)
-                expect(updated_post.title).to match("I am the one and you are the second")
+                expect(updated_post.title).to eq('another arrow title')
+            end
+
+            it 'have http status 204' do
+                expect(response).to have_http_status(204)
             end
         end
 
-        context 'post does not exist' do
-            let(:post_id) { 0 }
+        context 'invalid params' do
+            before { put "/users/#{user_id}/posts/#{post_id}", params: { title: nil }.to_json, headers: headers }
 
-            it 'have http status 404' do
-                expect(response).to have_http_status(404)
+            it 'return failure message' do
+                expect(response.body).to match(/Title can't be blank/)
             end
 
-            it 'reutrn not found failure message' do
-                expect(response.body).to match(/Couldn't find Post/)
+            it 'have http status 422' do
+                expect(response).to have_http_status(422)
             end
         end
     end
 
-    describe 'DELETE /users/:user_id/posts/:post_id' do
-        before { delete "/users/#{user_id}/posts/#{post_id}" }
+    describe 'DELETE /posts/:post_id' do
+        before { delete "/users/#{user_id}/posts/#{post_id}", params: { }, headers: headers }
 
-        it 'have http status 204' do
+        it 'have http status 204 ' do
             expect(response).to have_http_status(204)
         end
     end
