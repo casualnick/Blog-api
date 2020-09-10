@@ -1,35 +1,38 @@
-# Blog-api
-Api only version of my Project 
+# Blogy
+Simple blog created with Rails 
 
-For more information visit my project ['Project' repository](https://github.com/casualnick/Project)
-
-## Setup 
-To run this aplication, clone the git repo and run tests
-
-```
-bundle exec rspec
-```
-
-## Authentication with JWT
-
-Instead of casual ruby protect_from_forgery i used JWT authorization token in this project to authenticate every users's request. To achive that I used gem:
-
-```
-gem 'jwt'
-```
-
-To authenticate user I create JWT helper in app/lib/json_web_token.rb that encode and decode JWT and raise custom error if token is invalid, every custom error handler is in app/controller/concerns/exception_handler.rb.
-
-Then i created authorize_request in app./auth that takes header as an argument and return user if decoded token is correct. Next, I authenticate user in app/auth/authenticate_user.rb. That class take email and the password as and argument and check if user is valid with authenticate method that is provide thanks to bcrypt gem.
-
-In order to everithing work fine, I create AuthenticateController to return auth token as json if user is valid.
-
-To Authenticate every request on use actions, I made authenticate method in application_controller as every controller ihnerit from it. Only exception is authentiacte methods and user create method. 
-
-
- ## Based on Json
+## Technologies
+ - Rails 6.0.3.2
+ - HTML 5
+ - CSS 
+ - RSpesc 4.0.1
  
- That api project is based on json.
- 
- #### This is apy_only version of Blogy, so application hasn't got any views. In order to see how Blogy is working, click link above. ( Working on designing )
+ ## Gems 
+  - shoulda-matchers 4.0
+  - email_validator
+  - rails-controller-testing
+  - faker
+  - bcrypt 3.1.7
+  
+  ## Baisc information
+  This aplication is simple blog created with mentioned above technologies. It allows a lot of function that need blog to work properly. In later chapters i would like to introduce\
+   to you more about functionality of my project and solutions that I used
+   
+   ## Sections 
+   - [ HomePage ](#homepage)
+   - [ User Panel ](#user_panel)
+   - [ Showing all posts ](#showing_all_posts)
+   - [ Admin Panel](#admin_panel)
 
+ # homepage 
+  Home page shows all of posts and give oportunity of commenting them / updateing deleting them if currently logged user is author of post.
+  
+  # user_panel
+  
+  It is simply account profile where user can add new post / update it update his accout and delete it if it is need. He can also write messages to others user. In user panel you can see all information about your profile (except password)
+  
+  # admin_panel
+  
+  Acces to user panel only have admins and it allows to deleting(banning) / users and send them messages 
+  
+  ## More infromation and pictures of application working soon. I am working on designing.
